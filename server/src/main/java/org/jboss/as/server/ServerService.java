@@ -202,7 +202,7 @@ public final class ServerService extends AbstractControllerService {
                           final DelegatingConfigurableAuthorizer authorizer, final ManagementSecurityIdentitySupplier securityIdentitySupplier, final CapabilityRegistry capabilityRegistry,
                           final SuspendController suspendController) {
         super(executorService, instabilityListener, getProcessType(configuration.getServerEnvironment()), runningModeControl, null, processState,
-                rootResourceDefinition, prepareStep, new RuntimeExpressionResolver(vaultReader), auditLogger, authorizer, securityIdentitySupplier, capabilityRegistry);
+                rootResourceDefinition, prepareStep, new RuntimeExpressionResolver(vaultReader, capabilityRegistry), auditLogger, authorizer, securityIdentitySupplier, capabilityRegistry);
         this.configuration = configuration;
         this.bootstrapListener = bootstrapListener;
         this.processState = processState;

@@ -13,6 +13,7 @@
         <feature-group name="elytron-common"/>
         <feature-group name="elytron-app"/>
     </feature>
+    <feature-group name="elytron-overrides"/>
     <feature spec="subsystem.request-controller"/>
     <feature-group name="security-manager"/>
 </feature-group-spec>

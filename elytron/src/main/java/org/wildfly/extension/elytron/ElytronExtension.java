@@ -120,6 +120,8 @@ public class ElytronExtension implements Extension {
         AtomicReference<ExpressionResolverExtension> resolverRef = new AtomicReference<>();
         final ManagementResourceRegistration registration = subsystemRegistration.registerSubsystemModel(new ElytronDefinition(resolverRef));
         registration.registerOperationHandler(GenericSubsystemDescribeHandler.DEFINITION, GenericSubsystemDescribeHandler.INSTANCE);
+        System.out.println(context.getStability().toString());
+        System.out.println(ElytronSubsystemSchema.CURRENT.get(context.getStability()).toString());
         subsystemRegistration.registerXMLElementWriter(new PersistentResourceXMLDescriptionWriter(ElytronSubsystemSchema.CURRENT.get(context.getStability())));
 
         context.registerExpressionResolverExtension(resolverRef::get, ExpressionResolverResourceDefinition.INITIAL_PATTERN, false);

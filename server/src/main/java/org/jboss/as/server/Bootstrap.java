@@ -23,6 +23,7 @@ import org.jboss.as.controller.persistence.ExtensibleConfigurationPersister;
 import org.jboss.as.server.controller.git.GitConfigurationPersister;
 import org.jboss.as.controller.persistence.XmlConfigurationPersister;
 import org.jboss.as.server.parsing.StandaloneXml;
+import org.jboss.as.version.Stability;
 import org.jboss.modules.Module;
 import org.jboss.modules.ModuleLoader;
 import org.jboss.msc.service.ServiceActivator;
@@ -198,6 +199,7 @@ public interface Bootstrap {
                             configurationFile.resetBootFile(runningModeControl.isUseCurrentConfig(), runningModeControl.getAndClearNewBootFileName());
                         }
                         QName rootElement = new QName(Namespace.CURRENT.getUriString(), "server");
+                        Stability stability = serverEnvironment.getStability();
                         StandaloneXml parser = new StandaloneXml(Module.getBootModuleLoader(), executorService, extensionRegistry);
                         XmlConfigurationPersister persister;
                         if (configurationFile.useGit()) {

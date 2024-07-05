@@ -3782,4 +3782,7 @@ public interface ControllerLogger extends BasicLogger {
     @LogMessage(level = WARN)
     @Message(id = 512, value = "No resource exists at address '%s'. Ignoring the remove opreation.")
     void removingUnexistingResource(String address);
+
+    @Message(id = 513, value = "Management namespace %s is not enabled by the current stability level")
+    XMLStreamException unstableManagementNamespace(String namespaceURI);
 }

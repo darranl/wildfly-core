@@ -19,6 +19,8 @@ import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 import javax.naming.InvalidNameException;
 import javax.naming.NamingException;
@@ -455,10 +457,18 @@ class LdapRealmDefinition extends SimpleResourceDefinition {
             builder.setHashEncoding(HEX.equals(hashEncoding) ? Encoding.HEX : Encoding.BASE64);
             builder.setHashCharset(charset);
 
-            TrivialService<SecurityRealm> ldapRealmService = new TrivialService<>(builder::build);
-            ServiceBuilder<SecurityRealm> serviceBuilder = serviceTarget.addService(mainServiceName, ldapRealmService)
-                    .addAliases(aliasServiceName);
+            ServiceBuilder<?> serviceBuilder = serviceTarget.addService();
+            Consumer<SecurityRealm> valueConsumer = serviceBuilder.provides(mainServiceName);
+            serviceBuilder.addAliases(aliasServiceName);
 
+            Function<SecurityRealm, SecurityRealm> realmTransformer =
+                    (Function<SecurityRealm, SecurityRealm>) RealmDefinitions.CustomRealmBruteForceTransformer.INSTANCE
+                            .prepareTransformer(context.getCurrentAddressValue(), serviceBuilder);
+
+            TrivialService<SecurityRealm> ldapRealmService = new TrivialService<>(() -> realmTransformer.apply(builder.build()), valueConsumer);
+
+
+            serviceBuilder.setInstance(ldapRealmService);
             commonDependencies(serviceBuilder);
 
             configureIdentityMapping(context, model, builder);
@@ -467,7 +477,7 @@ class LdapRealmDefinition extends SimpleResourceDefinition {
             serviceBuilder.setInitialMode(ServiceController.Mode.ACTIVE).install();
         }
 
-        private void configureDirContext(OperationContext context, ModelNode model, LdapSecurityRealmBuilder realmBuilder, ServiceBuilder<SecurityRealm> serviceBuilder) throws OperationFailedException {
+        private void configureDirContext(OperationContext context, ModelNode model, LdapSecurityRealmBuilder realmBuilder, ServiceBuilder<?> serviceBuilder) throws OperationFailedException {
             String dirContextName = DIR_CONTEXT.resolveModelAttribute(context, model).asStringOrNull();
 
             String runtimeCapability = RuntimeCapability.buildDynamicCapabilityName(DIR_CONTEXT_CAPABILITY, dirContextName);

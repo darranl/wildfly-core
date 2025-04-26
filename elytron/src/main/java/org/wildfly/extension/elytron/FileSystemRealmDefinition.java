@@ -31,6 +31,8 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.UnrecoverableKeyException;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 import javax.crypto.SecretKey;
@@ -327,6 +329,14 @@ class FileSystemRealmDefinition extends SimpleResourceDefinition {
             final SecretKey finalKey = key;
             ServiceRegistry keyStoreServiceRegistry = context.getServiceRegistry(true);
 
+            ServiceBuilder<?> serviceBuilder = serviceTarget.addService();
+            Consumer<SecurityRealm> valueConsumer = serviceBuilder.provides(mainServiceName);
+            serviceBuilder.addAliases(aliasServiceName);
+
+            Function<SecurityRealm, SecurityRealm> realmTransformer =
+                    (Function<SecurityRealm, SecurityRealm>) RealmDefinitions.CustomRealmBruteForceTransformer.INSTANCE
+                            .prepareTransformer(context.getCurrentAddressValue(), serviceBuilder);
+
             TrivialService<SecurityRealm> fileSystemRealmService = new TrivialService<>(
                     new TrivialService.ValueSupplier<SecurityRealm>() {
 
@@ -382,7 +392,7 @@ class FileSystemRealmDefinition extends SimpleResourceDefinition {
                                 fileSystemRealmBuilder.setPrivateKey(privateKey);
                                 fileSystemRealmBuilder.setPublicKey(publicKey);
                             }
-                            return fileSystemRealmBuilder.build();
+                            return realmTransformer.apply(fileSystemRealmBuilder.build());
 
                         }
 
@@ -394,10 +404,8 @@ class FileSystemRealmDefinition extends SimpleResourceDefinition {
                             }
                         }
 
-                    });
+                    }, valueConsumer);
 
-            ServiceBuilder<SecurityRealm> serviceBuilder = serviceTarget.addService(mainServiceName, fileSystemRealmService)
-                    .addAliases(aliasServiceName);
             if (credentialStore != null) {
                 serviceBuilder.requires(context.getCapabilityServiceName(buildDynamicCapabilityName(CREDENTIAL_STORE_CAPABILITY, credentialStore), CredentialStore.class));
             }
@@ -410,6 +418,7 @@ class FileSystemRealmDefinition extends SimpleResourceDefinition {
                 serviceBuilder.addDependency(PathManagerService.SERVICE_NAME, PathManager.class, pathManagerInjector);
                 serviceBuilder.requires(pathName(relativeTo));
             }
+            serviceBuilder.setInstance(fileSystemRealmService);
             serviceBuilder.install();
         }
 

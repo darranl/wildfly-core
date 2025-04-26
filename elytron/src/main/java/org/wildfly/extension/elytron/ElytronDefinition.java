@@ -199,7 +199,7 @@ class ElytronDefinition extends SimpleResourceDefinition {
         resourceRegistration.registerSubModel(new AggregateRealmDefinition());
         resourceRegistration.registerSubModel(new CustomComponentDefinition<>(SecurityRealm.class, CustomRealmBruteForceTransformer.INSTANCE, ElytronDescriptionConstants.CUSTOM_REALM, SECURITY_REALM_RUNTIME_CAPABILITY));
         resourceRegistration.registerSubModel(ModifiableRealmDecorator.wrap(new CustomComponentDefinition<>(
-                ModifiableSecurityRealm.class, ElytronDefinition::identity, ElytronDescriptionConstants.CUSTOM_MODIFIABLE_REALM,
+                ModifiableSecurityRealm.class, CustomRealmBruteForceTransformer.INSTANCE, ElytronDescriptionConstants.CUSTOM_MODIFIABLE_REALM,
                 MODIFIABLE_SECURITY_REALM_RUNTIME_CAPABILITY, SECURITY_REALM_RUNTIME_CAPABILITY)));
         resourceRegistration.registerSubModel(RealmDefinitions.getIdentityRealmDefinition());
         resourceRegistration.registerSubModel(new JdbcRealmDefinition());

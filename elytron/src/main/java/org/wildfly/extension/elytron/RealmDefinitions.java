@@ -4,10 +4,8 @@
  */
 package org.wildfly.extension.elytron;
 
-import static org.wildfly.extension.elytron.Capabilities.SECURITY_REALM_RUNTIME_CAPABILITY;
-
 import static org.wildfly.extension.elytron.Capabilities.SCHEDULED_EXECUTOR_RUNTIME_CAPABILITY;
-
+import static org.wildfly.extension.elytron.Capabilities.SECURITY_REALM_RUNTIME_CAPABILITY;
 import static org.wildfly.security.manager.WildFlySecurityManager.getPropertyPrivileged;
 
 import java.util.Collection;
@@ -28,7 +26,6 @@ import org.jboss.as.controller.StringListAttributeDefinition;
 import org.jboss.dmr.ModelNode;
 import org.jboss.dmr.ModelType;
 import org.jboss.msc.service.ServiceBuilder;
-import org.jboss.msc.service.ServiceTarget;
 import org.wildfly.extension.elytron.TrivialService.ValueSupplier;
 import org.wildfly.security.auth.realm.BruteForceWrapperRealm;
 import org.wildfly.security.auth.realm.SimpleMapBackedSecurityRealm;
@@ -113,9 +110,9 @@ class RealmDefinitions {
         }
     }
 
-    static SecurityRealm addBruteForceProtection(final SecurityRealm original, final ScheduledExecutorService executor,
+    static <T extends SecurityRealm> T addBruteForceProtection(final T original, final ScheduledExecutorService executor,
                                                  final int maxAttempts, final int lockoutInterval, final int sessionTimeout) {
-        return BruteForceWrapperRealm.builder()
+        return (T) BruteForceWrapperRealm.builder()
                 .wrapping(original)
                 .withExecutor(executor)
                 .setMaxFailedAttempts(maxAttempts)
@@ -124,13 +121,13 @@ class RealmDefinitions {
                 .build();
     }
 
-    static class CustomRealmBruteForceTransformer implements CustomComponentDefinition.CustomComponentTransformer<SecurityRealm, SecurityRealm> {
+    static class CustomRealmBruteForceTransformer<T extends SecurityRealm> implements CustomComponentDefinition.CustomComponentTransformer<T, T> {
 
         static final CustomRealmBruteForceTransformer INSTANCE = new CustomRealmBruteForceTransformer();
 
         @Override
         public Object prepareTransformer(String name, ServiceBuilder<?> serviceBuilder) {
-            Function<SecurityRealm, SecurityRealm> transformer;
+            Function<T, T> transformer;
             if (isBruteForceProtectionEnabled(name)) {
                 final Supplier<ScheduledExecutorService> executorSupplier =
                         serviceBuilder.requires(SCHEDULED_EXECUTOR_RUNTIME_CAPABILITY.getCapabilityServiceName());
@@ -147,8 +144,8 @@ class RealmDefinitions {
         }
 
         @Override
-        public SecurityRealm apply(Object o, SecurityRealm securityRealm) {
-            return ((Function<SecurityRealm, SecurityRealm>) o).apply(securityRealm);
+        public T apply(Object o, T securityRealm) {
+            return ((Function<T, T>) o).apply(securityRealm);
         }
 
     }

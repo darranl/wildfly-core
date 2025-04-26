@@ -5,6 +5,7 @@
 
 package org.wildfly.extension.elytron;
 
+import org.wildfly.extension.elytron.RealmDefinitions.CustomRealmBruteForceTransformer;
 
 import static org.jboss.as.server.security.VirtualDomainUtil.VIRTUAL_SECURITY_DOMAIN_CREATION_SERVICE;
 import static org.wildfly.extension.elytron.Capabilities.AUTHENTICATION_CONTEXT_CAPABILITY;
@@ -196,7 +197,7 @@ class ElytronDefinition extends SimpleResourceDefinition {
 
         // Security Realms
         resourceRegistration.registerSubModel(new AggregateRealmDefinition());
-        resourceRegistration.registerSubModel(new CustomComponentDefinition<>(SecurityRealm.class, ElytronDefinition::identity, ElytronDescriptionConstants.CUSTOM_REALM, SECURITY_REALM_RUNTIME_CAPABILITY));
+        resourceRegistration.registerSubModel(new CustomComponentDefinition<>(SecurityRealm.class, CustomRealmBruteForceTransformer.INSTANCE, ElytronDescriptionConstants.CUSTOM_REALM, SECURITY_REALM_RUNTIME_CAPABILITY));
         resourceRegistration.registerSubModel(ModifiableRealmDecorator.wrap(new CustomComponentDefinition<>(
                 ModifiableSecurityRealm.class, ElytronDefinition::identity, ElytronDescriptionConstants.CUSTOM_MODIFIABLE_REALM,
                 MODIFIABLE_SECURITY_REALM_RUNTIME_CAPABILITY, SECURITY_REALM_RUNTIME_CAPABILITY)));

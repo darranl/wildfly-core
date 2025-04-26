@@ -6,10 +6,17 @@ package org.wildfly.extension.elytron;
 
 import static org.wildfly.extension.elytron.Capabilities.SECURITY_REALM_RUNTIME_CAPABILITY;
 
+import static org.wildfly.extension.elytron.Capabilities.SCHEDULED_EXECUTOR_RUNTIME_CAPABILITY;
+
+import static org.wildfly.security.manager.WildFlySecurityManager.getPropertyPrivileged;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 import org.jboss.as.controller.AbstractAddStepHandler;
 import org.jboss.as.controller.AttributeDefinition;
@@ -21,7 +28,9 @@ import org.jboss.as.controller.StringListAttributeDefinition;
 import org.jboss.dmr.ModelNode;
 import org.jboss.dmr.ModelType;
 import org.jboss.msc.service.ServiceBuilder;
+import org.jboss.msc.service.ServiceTarget;
 import org.wildfly.extension.elytron.TrivialService.ValueSupplier;
+import org.wildfly.security.auth.realm.BruteForceWrapperRealm;
 import org.wildfly.security.auth.realm.SimpleMapBackedSecurityRealm;
 import org.wildfly.security.auth.realm.SimpleRealmEntry;
 import org.wildfly.security.auth.server.SecurityRealm;
@@ -32,6 +41,14 @@ import org.wildfly.security.authz.MapAttributes;
  * @author <a href="mailto:darran.lofthouse@jboss.com">Darran Lofthouse</a>
  */
 class RealmDefinitions {
+
+    /**
+     * System properties used to configure brute force protection on the security realms.
+     */
+    private static final String BRUTE_FORCE_ENABLED = "wildfly.elytron.realm.%s.brute-force.enabled";
+    private static final String BRUTE_FORCE_MAX_FAILED_ATTEMPTS = "wildfly.elytron.realm.%s.brute-force.max-failed-attempts";
+    private static final String BRUTE_FORCE_LOCKOUT_INTERVAL = "wildfly.elytron.realm.%s.brute-force.lockout-interval";
+    private static final String BRUTE_FORCE_SESSION_TIMEOUT = "wildfly.elytron.realm.%s.brute-force.session-timeout";
 
     static final AttributeDefinition IDENTITY = new SimpleAttributeDefinitionBuilder(ElytronDescriptionConstants.IDENTITY, ModelType.STRING, false)
             .setAllowExpression(true)
@@ -82,5 +99,57 @@ class RealmDefinitions {
         };
 
         return new TrivialResourceDefinition(ElytronDescriptionConstants.IDENTITY_REALM, add, IDENTITY_REALM_ATTRIBUTES, SECURITY_REALM_RUNTIME_CAPABILITY);
+    }
+
+    private static boolean isBruteForceProtectionEnabled(final String realmName) {
+        return Boolean.parseBoolean(getPropertyPrivileged(String.format(BRUTE_FORCE_ENABLED, realmName), "true"));
+    }
+
+    private static int getBruteForceConfigValue(final String realmName, final String systemPropertyTemplate) {
+        try {
+            return Integer.parseInt(getPropertyPrivileged(String.format(systemPropertyTemplate, realmName), "-1"));
+        } catch (NumberFormatException e) {
+            return -1;
+        }
+    }
+
+    static SecurityRealm addBruteForceProtection(final SecurityRealm original, final ScheduledExecutorService executor,
+                                                 final int maxAttempts, final int lockoutInterval, final int sessionTimeout) {
+        return BruteForceWrapperRealm.builder()
+                .wrapping(original)
+                .withExecutor(executor)
+                .setMaxFailedAttempts(maxAttempts)
+                .setLockoutInterval(lockoutInterval)
+                .setFailureSessionTimeout(sessionTimeout)
+                .build();
+    }
+
+    static class CustomRealmBruteForceTransformer implements CustomComponentDefinition.CustomComponentTransformer<SecurityRealm, SecurityRealm> {
+
+        static final CustomRealmBruteForceTransformer INSTANCE = new CustomRealmBruteForceTransformer();
+
+        @Override
+        public Object prepareTransformer(String name, ServiceBuilder<?> serviceBuilder) {
+            Function<SecurityRealm, SecurityRealm> transformer;
+            if (isBruteForceProtectionEnabled(name)) {
+                final Supplier<ScheduledExecutorService> executorSupplier =
+                        serviceBuilder.requires(SCHEDULED_EXECUTOR_RUNTIME_CAPABILITY.getCapabilityServiceName());
+                int maxAttempts = getBruteForceConfigValue(name, BRUTE_FORCE_MAX_FAILED_ATTEMPTS);
+                int lockoutInterval = getBruteForceConfigValue(name, BRUTE_FORCE_LOCKOUT_INTERVAL);
+                int sessionTimeout = getBruteForceConfigValue(name, BRUTE_FORCE_SESSION_TIMEOUT);
+
+                transformer = (r) -> addBruteForceProtection(r, executorSupplier.get(), maxAttempts, lockoutInterval, sessionTimeout);
+            } else {
+                transformer = Function.identity();
+            }
+
+            return transformer;
+        }
+
+        @Override
+        public SecurityRealm apply(Object o, SecurityRealm securityRealm) {
+            return ((Function<SecurityRealm, SecurityRealm>) o).apply(securityRealm);
+        }
+
     }
 }

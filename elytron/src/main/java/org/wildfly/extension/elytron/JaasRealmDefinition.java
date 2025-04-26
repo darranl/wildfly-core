@@ -34,6 +34,8 @@ import org.wildfly.security.auth.server.SecurityRealm;
 import javax.security.auth.callback.CallbackHandler;
 import java.io.File;
 import java.security.PrivilegedExceptionAction;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 import static org.wildfly.extension.elytron.Capabilities.SECURITY_REALM_RUNTIME_CAPABILITY;
 import static org.wildfly.extension.elytron.ClassLoadingAttributeDefinitions.resolveClassLoader;
@@ -127,6 +129,14 @@ public class JaasRealmDefinition extends SimpleResourceDefinition {
 
             final InjectedValue<PathManager> pathManagerInjector = new InjectedValue<>();
 
+            ServiceName realmName = runtimeCapability.getCapabilityServiceName(SecurityRealm.class);
+            ServiceBuilder<?> serviceBuilder = serviceTarget.addService();
+            Consumer<SecurityRealm> realmConsumer = serviceBuilder.provides(realmName);
+
+            Function<SecurityRealm, SecurityRealm> realmTransformer =
+                    (Function<SecurityRealm, SecurityRealm>) RealmDefinitions.CustomRealmBruteForceTransformer.INSTANCE
+                            .prepareTransformer(context.getCurrentAddressValue(), serviceBuilder);
+
             CallbackHandler finalCallbackHandler = callbackhandler;
             TrivialService<SecurityRealm> jaasRealmService = new TrivialService<>(
                     new TrivialService.ValueSupplier<SecurityRealm>() {
@@ -143,7 +153,7 @@ public class JaasRealmDefinition extends SimpleResourceDefinition {
                                 }
                                 rootPath = jaasConfigFile.getPath();
                             }
-                            return new JaasSecurityRealm(entryName, rootPath, classLoader, finalCallbackHandler);
+                            return realmTransformer.apply(new JaasSecurityRealm(entryName, rootPath, classLoader, finalCallbackHandler));
                         }
 
                         @Override
@@ -153,10 +163,7 @@ public class JaasRealmDefinition extends SimpleResourceDefinition {
                                 pathResolver = null;
                             }
                         }
-                    });
-
-            ServiceName realmName = runtimeCapability.getCapabilityServiceName(SecurityRealm.class);
-            ServiceBuilder<SecurityRealm> serviceBuilder = serviceTarget.addService(realmName, jaasRealmService);
+                    }, realmConsumer);
 
             if (relativeTo != null) {
                 serviceBuilder.addDependency(PathManagerService.SERVICE_NAME, PathManager.class, pathManagerInjector);
@@ -164,6 +171,7 @@ public class JaasRealmDefinition extends SimpleResourceDefinition {
             }
 
             commonDependencies(serviceBuilder)
+                    .setInstance(jaasRealmService)
                     .setInitialMode(ServiceController.Mode.ACTIVE)
                     .install();
         }

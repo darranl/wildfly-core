@@ -24,6 +24,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 import javax.sql.DataSource;
 
@@ -612,8 +614,14 @@ class JdbcRealmDefinition extends SimpleResourceDefinition {
             final JdbcSecurityRealmBuilder builder = JdbcSecurityRealm.builder();
             builder.setHashCharset(charset);
 
-            TrivialService<SecurityRealm> service = new TrivialService<SecurityRealm>(builder::build);
-            ServiceBuilder<SecurityRealm> serviceBuilder = serviceTarget.addService(realmName, service);
+            ServiceBuilder<?> serviceBuilder = serviceTarget.addService();
+            Consumer<SecurityRealm> valueConsumer = serviceBuilder.provides(realmName);
+
+            Function<SecurityRealm, SecurityRealm> realmTransformer =
+                    (Function<SecurityRealm, SecurityRealm>) RealmDefinitions.CustomRealmBruteForceTransformer.INSTANCE
+                            .prepareTransformer(context.getCurrentAddressValue(), serviceBuilder);
+
+            TrivialService<SecurityRealm> service = new TrivialService<SecurityRealm>(() -> realmTransformer.apply(builder.build()), valueConsumer);
 
             for (ModelNode query : principalQueries.asList()) {
                 String authenticationQuerySql = PrincipalQueryAttributes.SQL.resolveModelAttribute(context, query).asString();
@@ -639,6 +647,7 @@ class JdbcRealmDefinition extends SimpleResourceDefinition {
                 });
             }
 
+            serviceBuilder.setInstance(service);
             commonDependencies(serviceBuilder)
                     .setInitialMode(context.getRunningMode() == RunningMode.ADMIN_ONLY ? ServiceController.Mode.LAZY : ServiceController.Mode.ACTIVE)
                     .install();

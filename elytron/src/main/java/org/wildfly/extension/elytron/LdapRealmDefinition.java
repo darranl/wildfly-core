@@ -61,6 +61,7 @@ import org.wildfly.extension.elytron.capabilities._private.DirContextSupplier;
 import org.wildfly.security.auth.realm.ldap.AttributeMapping;
 import org.wildfly.security.auth.realm.ldap.LdapSecurityRealmBuilder;
 import org.wildfly.security.auth.realm.ldap.LdapSecurityRealmBuilder.IdentityMappingBuilder;
+import org.wildfly.security.auth.server.ModifiableSecurityRealm;
 import org.wildfly.security.auth.server.SecurityRealm;
 import org.wildfly.security.password.spec.Encoding;
 
@@ -437,8 +438,8 @@ class LdapRealmDefinition extends SimpleResourceDefinition {
             ServiceTarget serviceTarget = context.getServiceTarget();
 
             String address = context.getCurrentAddressValue();
-            ServiceName mainServiceName = MODIFIABLE_SECURITY_REALM_RUNTIME_CAPABILITY.fromBaseCapability(address).getCapabilityServiceName();
-            ServiceName aliasServiceName = SECURITY_REALM_RUNTIME_CAPABILITY.fromBaseCapability(address).getCapabilityServiceName();
+            ServiceName modifiableServiceName = MODIFIABLE_SECURITY_REALM_RUNTIME_CAPABILITY.fromBaseCapability(address).getCapabilityServiceName();
+            ServiceName standardServiceName = SECURITY_REALM_RUNTIME_CAPABILITY.fromBaseCapability(address).getCapabilityServiceName();
 
             final LdapSecurityRealmBuilder builder = LdapSecurityRealmBuilder.builder();
 
@@ -458,15 +459,24 @@ class LdapRealmDefinition extends SimpleResourceDefinition {
             builder.setHashCharset(charset);
 
             ServiceBuilder<?> serviceBuilder = serviceTarget.addService();
-            Consumer<SecurityRealm> valueConsumer = serviceBuilder.provides(mainServiceName);
-            serviceBuilder.addAliases(aliasServiceName);
+            // This is the Service that will get pulled into a SecurityDomain etc...
+            Consumer<SecurityRealm> standardConsumer = serviceBuilder.provides(standardServiceName);
+            // This is the modifiable variant for resources that support modification operations etc..
+            Consumer<ModifiableSecurityRealm> modifiableConsumer = serviceBuilder.provides(modifiableServiceName);
 
-            Function<SecurityRealm, SecurityRealm> realmTransformer =
-                    (Function<SecurityRealm, SecurityRealm>) RealmDefinitions.CustomRealmBruteForceTransformer.INSTANCE
+            Function<ModifiableSecurityRealm, ModifiableSecurityRealm> realmTransformer =
+                    (Function<ModifiableSecurityRealm, ModifiableSecurityRealm>) RealmDefinitions.CustomRealmBruteForceTransformer.INSTANCE
                             .prepareTransformer(context.getCurrentAddressValue(), serviceBuilder);
 
-            TrivialService<SecurityRealm> ldapRealmService = new TrivialService<>(() -> realmTransformer.apply(builder.build()), valueConsumer);
+            TrivialService<SecurityRealm> ldapRealmService =
+                    new TrivialService<>(() -> {
+                        ModifiableSecurityRealm modifiable = builder.build();
+                        ModifiableSecurityRealm wrapped = realmTransformer.apply(modifiable);
+                        modifiableConsumer.accept(wrapped);
+                        standardConsumer.accept(wrapped);
 
+                        return modifiable;
+                    });
 
             serviceBuilder.setInstance(ldapRealmService);
             commonDependencies(serviceBuilder);

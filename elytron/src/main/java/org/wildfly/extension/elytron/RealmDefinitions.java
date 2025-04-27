@@ -4,6 +4,8 @@
  */
 package org.wildfly.extension.elytron;
 
+
+import static org.wildfly.extension.elytron._private.ElytronSubsystemMessages.ROOT_LOGGER;
 import static org.wildfly.extension.elytron.Capabilities.SCHEDULED_EXECUTOR_RUNTIME_CAPABILITY;
 import static org.wildfly.extension.elytron.Capabilities.SECURITY_REALM_RUNTIME_CAPABILITY;
 import static org.wildfly.security.manager.WildFlySecurityManager.getPropertyPrivileged;
@@ -135,8 +137,12 @@ class RealmDefinitions {
                 int lockoutInterval = getBruteForceConfigValue(name, BRUTE_FORCE_LOCKOUT_INTERVAL);
                 int sessionTimeout = getBruteForceConfigValue(name, BRUTE_FORCE_SESSION_TIMEOUT);
 
+                ROOT_LOGGER.tracef("Applying applying brute force protection to '%s' security realm. maxAttempts=%d, lockoutTimeout=%d, sessionTimeout=%d"
+                        , name, maxAttempts, lockoutInterval, sessionTimeout);
+
                 transformer = (r) -> addBruteForceProtection(r, executorSupplier.get(), maxAttempts, lockoutInterval, sessionTimeout);
             } else {
+                ROOT_LOGGER.tracef("Not applying brute force protection to '%s' security realm.", name);
                 transformer = Function.identity();
             }
 

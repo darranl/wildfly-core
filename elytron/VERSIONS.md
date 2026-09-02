@@ -12,8 +12,26 @@
 
 ## Schema Versions
 
-Schema versions are maintained independently from model versions.
-See ElytronSubsystemSchema.java for current schema versions.
+Schema versions are maintained independently from model versions and may exist at different stability levels.
+
+### DEFAULT Stability
+
+| Schema Version | WildFly Version | Notes |
+|----------------|-----------------|-------|
+| 19.0           | 42.0+           | Promoted dynamic-client-ssl-context to DEFAULT |
+| 18.0           | 32.0+           | See git history for details |
+| ...            | ...             | See git history for earlier versions |
+
+### COMMUNITY Stability
+
+| Schema Version | WildFly Version | Notes |
+|----------------|-----------------|-------|
+| 19.0           | 42.0+           | Pure version bump for WildFly 42 features |
+| 18.0           | 32.0+           | Added dynamic-client-ssl-context at COMMUNITY |
+
+### PREVIEW Stability
+
+No current PREVIEW schema versions.
 
 ## Version Bump Guidelines
 

@@ -55,6 +55,7 @@ import static org.wildfly.extension.elytron.ElytronExtension.ELYTRON_16_0_0;
 import static org.wildfly.extension.elytron.ElytronExtension.ELYTRON_17_0_0;
 import static org.wildfly.extension.elytron.ElytronExtension.ELYTRON_18_0_0;
 import static org.wildfly.extension.elytron.ElytronExtension.ELYTRON_19_0_0;
+import static org.wildfly.extension.elytron.ElytronExtension.ELYTRON_20_0_0;
 import static org.wildfly.extension.elytron.ElytronExtension.ELYTRON_1_2_0;
 import static org.wildfly.extension.elytron.ElytronExtension.ELYTRON_2_0_0;
 import static org.wildfly.extension.elytron.ElytronExtension.ELYTRON_3_0_0;
@@ -106,7 +107,7 @@ public final class ElytronSubsystemTransformers implements ExtensionTransformerR
     public void registerTransformers(SubsystemTransformerRegistration registration) {
         ChainedTransformationDescriptionBuilder chainedBuilder = TransformationDescriptionBuilder.Factory.createChainedSubystemInstance(registration.getCurrentSubsystemVersion());
 
-        // 20.0.0 (WildFly 34) to 19.0.0 (WildFly 32)
+        // 20.0.0 (WildFly 42) to 19.0.0 (WildFly 32)
         from20(chainedBuilder);
         // 19.0.0 (WildFly 32) to 18.0.0 (WildFly 29)
         from19(chainedBuilder);
@@ -152,7 +153,7 @@ public final class ElytronSubsystemTransformers implements ExtensionTransformerR
     }
 
     private static void from20(ChainedTransformationDescriptionBuilder chainedBuilder) {
-        ResourceTransformationDescriptionBuilder builder = chainedBuilder.createBuilder(ELYTRON_19_0_0, ELYTRON_18_0_0);
+        ResourceTransformationDescriptionBuilder builder = chainedBuilder.createBuilder(ELYTRON_20_0_0, ELYTRON_19_0_0);
 
     }
 

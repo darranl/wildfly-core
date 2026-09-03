@@ -90,11 +90,13 @@
         </jdbc-realm>
         <properties-realm name="PropRealm">
             <users-properties path="users-hashed.properties" relative-to="jboss.server.config.dir"/>
+            <brute-force-protection enabled="true" max-failed-attempts="5" lockout-interval="10" session-timeout="15" max-cached-sessions="1000"/>
         </properties-realm>
         <properties-realm name="NonDomainRealm">
             <users-properties path="users-hashed.properties" relative-to="jboss.server.config.dir"/>
         </properties-realm>
         <filesystem-realm name="FileRealm" levels="2" encoded="false">
+            <brute-force-protection enabled="false" max-failed-attempts="3"/>
             <file path="filesystem-realm" relative-to="jboss.server.config.dir"/>
         </filesystem-realm>
         <distributed-realm name="DistributedRealm" realms="FileRealm PropRealm"/>

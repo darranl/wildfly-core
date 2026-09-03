@@ -53,6 +53,11 @@ class RealmParser {
             .addAttribute(PrincipalQueryAttributes.PRINCIPAL_QUERIES_7_0, AttributeParser.UNWRAPPED_OBJECT_LIST_PARSER, AttributeMarshaller.UNWRAPPED_OBJECT_LIST_MARSHALLER)
             .addAttribute(JdbcRealmDefinition.HASH_CHARSET)
             .build();
+    private final PersistentResourceXMLDescription jdbcRealmParser_19_0_community = builder(PathElement.pathElement(ElytronDescriptionConstants.JDBC_REALM))
+            .addAttribute(PrincipalQueryAttributes.PRINCIPAL_QUERIES_7_0, AttributeParser.UNWRAPPED_OBJECT_LIST_PARSER, AttributeMarshaller.UNWRAPPED_OBJECT_LIST_MARSHALLER)
+            .addAttribute(JdbcRealmDefinition.HASH_CHARSET)
+            .addAttribute(RealmDefinitions.BRUTE_FORCE_PROTECTION, AttributeParser.OBJECT_PARSER, AttributeMarshaller.ATTRIBUTE_OBJECT)
+            .build();
     private final PersistentResourceXMLDescription keyStoreRealmParser = builder(PathElement.pathElement(ElytronDescriptionConstants.KEY_STORE_REALM))
             .addAttribute(KeyStoreRealmDefinition.KEYSTORE)
             .build();
@@ -68,8 +73,25 @@ class RealmParser {
             .addAttribute(PropertiesRealmDefinition.HASH_CHARSET)
             .addAttribute(PropertiesRealmDefinition.HASH_ENCODING)
             .build();
+    private final PersistentResourceXMLDescription propertiesRealmParser_19_0_community = builder(PathElement.pathElement(ElytronDescriptionConstants.PROPERTIES_REALM))
+            .addAttributes(PropertiesRealmDefinition.GROUPS_ATTRIBUTE)
+            .addAttribute(PropertiesRealmDefinition.USERS_PROPERTIES, AttributeParser.OBJECT_PARSER, AttributeMarshaller.ATTRIBUTE_OBJECT)
+            .addAttribute(PropertiesRealmDefinition.GROUPS_PROPERTIES, AttributeParser.OBJECT_PARSER, AttributeMarshaller.ATTRIBUTE_OBJECT)
+            .addAttribute(PropertiesRealmDefinition.HASH_CHARSET)
+            .addAttribute(PropertiesRealmDefinition.HASH_ENCODING)
+            .addAttribute(RealmDefinitions.BRUTE_FORCE_PROTECTION, AttributeParser.OBJECT_PARSER, AttributeMarshaller.ATTRIBUTE_OBJECT)
+            .build();
     private final PersistentResourceXMLDescription ldapRealmParser = builder(PathElement.pathElement(ElytronDescriptionConstants.LDAP_REALM))
             .addAttributes(LdapRealmDefinition.ATTRIBUTES)
+            .build();
+    private final PersistentResourceXMLDescription ldapRealmParser_19_0_community = builder(PathElement.pathElement(ElytronDescriptionConstants.LDAP_REALM))
+            .addAttribute(LdapRealmDefinition.IdentityMappingObjectDefinition.OBJECT_DEFINITION, AttributeParser.OBJECT_PARSER, AttributeMarshaller.ATTRIBUTE_OBJECT)
+            .addAttribute(LdapRealmDefinition.DIR_CONTEXT)
+            .addAttribute(LdapRealmDefinition.DIRECT_VERIFICATION)
+            .addAttribute(LdapRealmDefinition.ALLOW_BLANK_PASSWORD)
+            .addAttribute(LdapRealmDefinition.HASH_ENCODING)
+            .addAttribute(LdapRealmDefinition.HASH_CHARSET)
+            .addAttribute(RealmDefinitions.BRUTE_FORCE_PROTECTION, AttributeParser.OBJECT_PARSER, AttributeMarshaller.ATTRIBUTE_OBJECT)
             .build();
     private final PersistentResourceXMLDescription fileSystemRealmDescription = builder(PathElement.pathElement(ElytronDescriptionConstants.FILESYSTEM_REALM))
             .addAttribute(FileSystemRealmDefinition.ENCODED)
@@ -108,12 +130,31 @@ class RealmParser {
             .addAttribute(FileSystemRealmDefinition.KEY_STORE) //new
             .addAttribute(FileSystemRealmDefinition.KEY_STORE_ALIAS) //new
             .build();
+    private final PersistentResourceXMLDescription filesystemRealmParser_19_0_community = builder(PathElement.pathElement(ElytronDescriptionConstants.FILESYSTEM_REALM))
+            .addAttributes(FileSystemRealmDefinition.PATH)
+            .addAttributes(FileSystemRealmDefinition.RELATIVE_TO)
+            .addAttributes(FileSystemRealmDefinition.LEVELS)
+            .addAttributes(FileSystemRealmDefinition.ENCODED)
+            .addAttributes(FileSystemRealmDefinition.HASH_ENCODING)
+            .addAttributes(FileSystemRealmDefinition.HASH_CHARSET)
+            .addAttributes(FileSystemRealmDefinition.CREDENTIAL_STORE)
+            .addAttributes(FileSystemRealmDefinition.SECRET_KEY)
+            .addAttribute(FileSystemRealmDefinition.KEY_STORE)
+            .addAttribute(FileSystemRealmDefinition.KEY_STORE_ALIAS)
+            .addAttribute(RealmDefinitions.BRUTE_FORCE_PROTECTION, AttributeParser.OBJECT_PARSER, AttributeMarshaller.ATTRIBUTE_OBJECT)
+            .build();
 
     private final PersistentResourceXMLDescription tokenRealmParser = builder(PathElement.pathElement(ElytronDescriptionConstants.TOKEN_REALM))
             .addAttributes(TokenRealmDefinition.ATTRIBUTES)
             .build();
     private final PersistentResourceXMLDescription cachingRealmParser = builder(PathElement.pathElement(ElytronDescriptionConstants.CACHING_REALM))
             .addAttributes(CachingRealmDefinition.ATTRIBUTES)
+            .build();
+    private final PersistentResourceXMLDescription cachingRealmParser_19_0_community = builder(PathElement.pathElement(ElytronDescriptionConstants.CACHING_REALM))
+            .addAttribute(CachingRealmDefinition.REALM_NAME)
+            .addAttribute(CachingRealmDefinition.MAXIMUM_ENTRIES)
+            .addAttribute(CachingRealmDefinition.MAXIMUM_AGE)
+            .addAttribute(RealmDefinitions.BRUTE_FORCE_PROTECTION, AttributeParser.OBJECT_PARSER, AttributeMarshaller.ATTRIBUTE_OBJECT)
             .build();
     private final PersistentResourceXMLDescription distributedRealmParser = builder(PathElement.pathElement(ElytronDescriptionConstants.DISTRIBUTED_REALM))
             .addAttribute(DistributedRealmDefinition.REALMS, AttributeParser.STRING_LIST, AttributeMarshaller.STRING_LIST)
@@ -123,11 +164,31 @@ class RealmParser {
             .addAttribute(DistributedRealmDefinition.IGNORE_UNAVAILABLE_REALMS)
             .addAttribute(DistributedRealmDefinition.EMIT_EVENTS)
             .build();
+    private final PersistentResourceXMLDescription distributedRealmParser_19_0_community = builder(PathElement.pathElement(ElytronDescriptionConstants.DISTRIBUTED_REALM))
+            .addAttribute(DistributedRealmDefinition.REALMS, AttributeParser.STRING_LIST, AttributeMarshaller.STRING_LIST)
+            .addAttribute(DistributedRealmDefinition.IGNORE_UNAVAILABLE_REALMS)
+            .addAttribute(DistributedRealmDefinition.EMIT_EVENTS)
+            .addAttribute(RealmDefinitions.BRUTE_FORCE_PROTECTION, AttributeParser.OBJECT_PARSER, AttributeMarshaller.ATTRIBUTE_OBJECT)
+            .build();
     private final PersistentResourceXMLDescription failoverRealmParser = builder(PathElement.pathElement(ElytronDescriptionConstants.FAILOVER_REALM))
             .addAttributes(FailoverRealmDefinition.ATTRIBUTES)
             .build();
+    private final PersistentResourceXMLDescription failoverRealmParser_19_0_community = builder(PathElement.pathElement(ElytronDescriptionConstants.FAILOVER_REALM))
+            .addAttribute(FailoverRealmDefinition.DELEGATE_REALM)
+            .addAttribute(FailoverRealmDefinition.FAILOVER_REALM)
+            .addAttribute(FailoverRealmDefinition.EMIT_EVENTS)
+            .addAttribute(RealmDefinitions.BRUTE_FORCE_PROTECTION, AttributeParser.OBJECT_PARSER, AttributeMarshaller.ATTRIBUTE_OBJECT)
+            .build();
     private final PersistentResourceXMLDescription jaasRealmParser = builder(PathElement.pathElement(ElytronDescriptionConstants.JAAS_REALM))
             .addAttributes(JaasRealmDefinition.ATTRIBUTES)
+            .build();
+    private final PersistentResourceXMLDescription jaasRealmParser_19_0_community = builder(PathElement.pathElement(ElytronDescriptionConstants.JAAS_REALM))
+            .addAttribute(JaasRealmDefinition.ENTRY)
+            .addAttribute(JaasRealmDefinition.PATH)
+            .addAttribute(JaasRealmDefinition.RELATIVE_TO)
+            .addAttribute(JaasRealmDefinition.MODULE)
+            .addAttribute(JaasRealmDefinition.CALLBACK_HANDLER)
+            .addAttribute(RealmDefinitions.BRUTE_FORCE_PROTECTION, AttributeParser.OBJECT_PARSER, AttributeMarshaller.ATTRIBUTE_OBJECT)
             .build();
 
     final PersistentResourceXMLDescription realmParser = decorator(ElytronDescriptionConstants.SECURITY_REALMS)
@@ -270,6 +331,23 @@ class RealmParser {
             .addChild(distributedRealmParser_18)
             .addChild(failoverRealmParser)
             .addChild(jaasRealmParser)
+            .build();
+
+    final PersistentResourceXMLDescription realmParser_19_0_community = decorator(ElytronDescriptionConstants.SECURITY_REALMS)
+            .addChild(aggregateRealmParser_8_0)
+            .addChild(customRealmParser)
+            .addChild(customModifiableRealmParser)
+            .addChild(identityRealmParser)
+            .addChild(jdbcRealmParser_19_0_community)
+            .addChild(keyStoreRealmParser)
+            .addChild(propertiesRealmParser_19_0_community)
+            .addChild(ldapRealmParser_19_0_community)
+            .addChild(filesystemRealmParser_19_0_community)
+            .addChild(tokenRealmParser)
+            .addChild(cachingRealmParser_19_0_community)
+            .addChild(distributedRealmParser_19_0_community)
+            .addChild(failoverRealmParser_19_0_community)
+            .addChild(jaasRealmParser_19_0_community)
             .build();
 
     RealmParser() {

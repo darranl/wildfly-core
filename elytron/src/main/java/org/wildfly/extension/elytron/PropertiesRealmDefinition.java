@@ -131,7 +131,7 @@ class PropertiesRealmDefinition {
             .setAllowExpression(true)
             .build();
 
-    static final AttributeDefinition[] ATTRIBUTES = new AttributeDefinition[] { USERS_PROPERTIES, GROUPS_PROPERTIES, GROUPS_ATTRIBUTE, HASH_ENCODING, HASH_CHARSET };
+    static final AttributeDefinition[] ATTRIBUTES = new AttributeDefinition[] { USERS_PROPERTIES, GROUPS_PROPERTIES, GROUPS_ATTRIBUTE, HASH_ENCODING, HASH_CHARSET, RealmDefinitions.BRUTE_FORCE_PROTECTION };
 
     // Resource Resolver
 
@@ -187,7 +187,7 @@ class PropertiesRealmDefinition {
             }
 
             Function<SecurityRealm, SecurityRealm> realmTransformer =
-                createBruteForceRealmTransformer(context.getCurrentAddressValue(), SecurityRealm.class, serviceBuilder);
+                createBruteForceRealmTransformer(context.getCurrentAddressValue(), SecurityRealm.class, serviceBuilder, context, model);
             return new ValueSupplier<SecurityRealm>() {
 
                 private final List<Handle> callbackHandles = new ArrayList<>();

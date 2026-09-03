@@ -75,7 +75,7 @@ class CachingRealmDefinition extends SimpleResourceDefinition {
             .setRestartAllServices()
             .build();
 
-    static final AttributeDefinition[] ATTRIBUTES = new AttributeDefinition[] {REALM_NAME, MAXIMUM_ENTRIES, MAXIMUM_AGE};
+    static final AttributeDefinition[] ATTRIBUTES = new AttributeDefinition[] {REALM_NAME, MAXIMUM_ENTRIES, MAXIMUM_AGE, RealmDefinitions.BRUTE_FORCE_PROTECTION};
 
     // Callers are expected to just use a single method get / put / remove not multiple calls so we don't
     // need complex locking beyond the Map itself..
@@ -127,7 +127,7 @@ class CachingRealmDefinition extends SimpleResourceDefinition {
             Consumer<SecurityRealm> valueConsumer = serviceBuilder.provides(realmName);
 
             final Function<SecurityRealm, SecurityRealm> realmTransformer =
-                createBruteForceRealmTransformer(context.getCurrentAddressValue(), SecurityRealm.class, serviceBuilder);
+                createBruteForceRealmTransformer(context.getCurrentAddressValue(), SecurityRealm.class, serviceBuilder, context, model);
 
             serviceBuilder.setInstance(createService(context.getCurrentAddressValue(), cacheableRealm, maxEntries, maxAge, cacheableRealmValue, realmTransformer, valueConsumer));
 

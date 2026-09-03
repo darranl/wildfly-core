@@ -52,7 +52,7 @@ import org.wildfly.security.auth.server.SecurityRealm;
  */
 public class JaasRealmDefinition extends SimpleResourceDefinition {
 
-    private static final SimpleAttributeDefinition ENTRY = new SimpleAttributeDefinitionBuilder(ElytronDescriptionConstants.ENTRY, ModelType.STRING, false)
+    static final SimpleAttributeDefinition ENTRY = new SimpleAttributeDefinitionBuilder(ElytronDescriptionConstants.ENTRY, ModelType.STRING, false)
             .setRequired(true)
             .setAllowExpression(true)
             .setRestartAllServices()
@@ -75,12 +75,12 @@ public class JaasRealmDefinition extends SimpleResourceDefinition {
             .setRestartAllServices()
             .build();
 
-    private static final SimpleAttributeDefinition CALLBACK_HANDLER = new SimpleAttributeDefinitionBuilder(ElytronDescriptionConstants.CALLBACK_HANDLER, ModelType.STRING, true)
+    static final SimpleAttributeDefinition CALLBACK_HANDLER = new SimpleAttributeDefinitionBuilder(ElytronDescriptionConstants.CALLBACK_HANDLER, ModelType.STRING, true)
             .setRequired(false)
             .setRestartAllServices()
             .build();
 
-    static final AttributeDefinition[] ATTRIBUTES = new AttributeDefinition[]{ENTRY, PATH, RELATIVE_TO, MODULE, CALLBACK_HANDLER};
+    static final AttributeDefinition[] ATTRIBUTES = new AttributeDefinition[]{ENTRY, PATH, RELATIVE_TO, MODULE, CALLBACK_HANDLER, RealmDefinitions.BRUTE_FORCE_PROTECTION};
 
     private static final AbstractAddStepHandler ADD = new JaasRealmDefinition.RealmAddHandler();
     private static final OperationStepHandler REMOVE = new TrivialCapabilityServiceRemoveHandler(ADD, SECURITY_REALM_RUNTIME_CAPABILITY);
@@ -136,7 +136,7 @@ public class JaasRealmDefinition extends SimpleResourceDefinition {
             Consumer<SecurityRealm> realmConsumer = serviceBuilder.provides(realmName);
 
             Function<SecurityRealm, SecurityRealm> realmTransformer =
-                createBruteForceRealmTransformer(context.getCurrentAddressValue(), SecurityRealm.class, serviceBuilder);
+                createBruteForceRealmTransformer(context.getCurrentAddressValue(), SecurityRealm.class, serviceBuilder, context, model);
 
             CallbackHandler finalCallbackHandler = callbackhandler;
             TrivialService<SecurityRealm> jaasRealmService = new TrivialService<>(

@@ -569,7 +569,7 @@ class JdbcRealmDefinition extends SimpleResourceDefinition {
             .setAllowExpression(true)
             .build();
 
-    static final AttributeDefinition[] ATTRIBUTES = new AttributeDefinition[] {PrincipalQueryAttributes.PRINCIPAL_QUERIES_7_0, HASH_CHARSET};
+    static final AttributeDefinition[] ATTRIBUTES = new AttributeDefinition[] {PrincipalQueryAttributes.PRINCIPAL_QUERIES_7_0, HASH_CHARSET, RealmDefinitions.BRUTE_FORCE_PROTECTION};
 
     private static final AbstractAddStepHandler ADD = new RealmAddHandler();
     private static final OperationStepHandler REMOVE = new TrivialCapabilityServiceRemoveHandler(ADD, SECURITY_REALM_RUNTIME_CAPABILITY);
@@ -619,7 +619,7 @@ class JdbcRealmDefinition extends SimpleResourceDefinition {
             Consumer<SecurityRealm> valueConsumer = serviceBuilder.provides(realmName);
 
             Function<SecurityRealm, SecurityRealm> realmTransformer =
-                createBruteForceRealmTransformer(context.getCurrentAddressValue(), SecurityRealm.class, serviceBuilder);
+                createBruteForceRealmTransformer(context.getCurrentAddressValue(), SecurityRealm.class, serviceBuilder, context, model);
 
             TrivialService<SecurityRealm> service = new TrivialService<SecurityRealm>(() -> realmTransformer.apply(builder.build()), valueConsumer);
 

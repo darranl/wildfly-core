@@ -229,17 +229,6 @@ class RealmDefinitions {
             return transformer;
     }
 
-    // Overload for backward compatibility (custom realms use system properties only)
-    static <T extends SecurityRealm> Function<T, T> createBruteForceRealmTransformer(String name, Class<T> clazz, ServiceBuilder<?> serviceBuilder) {
-        try {
-            return createBruteForceRealmTransformer(name, clazz, serviceBuilder, null, new ModelNode());
-        } catch (OperationFailedException e) {
-            // Should not happen with empty model
-            ROOT_LOGGER.tracef("Not applying brute force protection to '%s' security realm due to error: %s", name, e.getMessage());
-            return Function.identity();
-        }
-    }
-
     static class CustomRealmBruteForceTransformer<T extends SecurityRealm> implements CustomComponentDefinition.CustomComponentTransformer<T, T> {
 
         private final Class<T> securityRealmClazz;
@@ -249,8 +238,10 @@ class RealmDefinitions {
         }
 
         @Override
-        public Object prepareTransformer(String name, ServiceBuilder<?> serviceBuilder) {
-            return createBruteForceRealmTransformer(name, securityRealmClazz, serviceBuilder);
+        public Object prepareTransformer(String name, ServiceBuilder<?> serviceBuilder,
+                                          OperationContext context, ModelNode model)
+                throws OperationFailedException {
+            return createBruteForceRealmTransformer(name, securityRealmClazz, serviceBuilder, context, model);
         }
 
         @Override

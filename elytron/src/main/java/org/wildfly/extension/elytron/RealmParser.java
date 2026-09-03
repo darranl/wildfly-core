@@ -38,6 +38,16 @@ class RealmParser {
             .addAttributes(CustomComponentDefinition.ATTRIBUTES)
             .setUseElementsForGroups(false)
             .build();
+    private final PersistentResourceXMLDescription customRealmParser_19_0_community = builder(PathElement.pathElement(ElytronDescriptionConstants.CUSTOM_REALM))
+            .addAttributes(CustomComponentDefinition.ATTRIBUTES)
+            .addAttribute(RealmDefinitions.BRUTE_FORCE_PROTECTION, AttributeParser.OBJECT_PARSER, AttributeMarshaller.ATTRIBUTE_OBJECT)
+            .setUseElementsForGroups(false)
+            .build();
+    private final PersistentResourceXMLDescription customModifiableRealmParser_19_0_community = builder(PathElement.pathElement(ElytronDescriptionConstants.CUSTOM_MODIFIABLE_REALM))
+            .addAttributes(CustomComponentDefinition.ATTRIBUTES)
+            .addAttribute(RealmDefinitions.BRUTE_FORCE_PROTECTION, AttributeParser.OBJECT_PARSER, AttributeMarshaller.ATTRIBUTE_OBJECT)
+            .setUseElementsForGroups(false)
+            .build();
     private final PersistentResourceXMLDescription identityRealmParser = builder(PathElement.pathElement(ElytronDescriptionConstants.IDENTITY_REALM))
             .addAttributes(RealmDefinitions.IDENTITY_REALM_ATTRIBUTES)
             .setUseElementsForGroups(false)
@@ -335,8 +345,8 @@ class RealmParser {
 
     final PersistentResourceXMLDescription realmParser_19_0_community = decorator(ElytronDescriptionConstants.SECURITY_REALMS)
             .addChild(aggregateRealmParser_8_0)
-            .addChild(customRealmParser)
-            .addChild(customModifiableRealmParser)
+            .addChild(customRealmParser_19_0_community)
+            .addChild(customModifiableRealmParser_19_0_community)
             .addChild(identityRealmParser)
             .addChild(jdbcRealmParser_19_0_community)
             .addChild(keyStoreRealmParser)

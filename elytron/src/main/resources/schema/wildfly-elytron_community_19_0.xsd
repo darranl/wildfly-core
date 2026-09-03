@@ -1199,6 +1199,13 @@
                             </xs:documentation>
                         </xs:annotation>
                     </xs:element>
+                    <xs:element name="brute-force-protection" type="bruteForceProtectionType" minOccurs="0">
+                        <xs:annotation>
+                            <xs:documentation>
+                                Configuration for brute force authentication protection.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
                 </xs:sequence>
                 <xs:attributeGroup ref="customComponentAttributes" />
             </xs:extension>

@@ -17,6 +17,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import static org.jboss.as.version.Stability.COMMUNITY;
+
 import org.jboss.as.controller.AbstractAddStepHandler;
 import org.jboss.as.controller.AttributeDefinition;
 import org.jboss.as.controller.ObjectTypeAttributeDefinition;
@@ -118,6 +120,7 @@ class RealmDefinitions {
             BF_SESSION_TIMEOUT,
             BF_MAX_CACHED_SESSIONS)
             .setRequired(false)
+            .setStability(COMMUNITY)
             .setRestartAllServices()
             .build();
 

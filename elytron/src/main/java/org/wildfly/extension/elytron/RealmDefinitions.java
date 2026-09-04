@@ -28,6 +28,7 @@ import org.jboss.as.controller.ResourceDefinition;
 import org.jboss.as.controller.SimpleAttributeDefinition;
 import org.jboss.as.controller.SimpleAttributeDefinitionBuilder;
 import org.jboss.as.controller.StringListAttributeDefinition;
+import org.jboss.as.controller.client.helpers.MeasurementUnit;
 import org.jboss.as.controller.operations.validation.IntRangeValidator;
 import org.jboss.dmr.ModelNode;
 import org.jboss.dmr.ModelType;
@@ -93,6 +94,7 @@ class RealmDefinitions {
     static final SimpleAttributeDefinition BF_LOCKOUT_INTERVAL = new SimpleAttributeDefinitionBuilder(ElytronDescriptionConstants.LOCKOUT_INTERVAL, ModelType.INT)
             .setRequired(false)
             .setAllowExpression(true)
+            .setMeasurementUnit(MeasurementUnit.MINUTES)
             .setValidator(new IntRangeValidator(-1, Integer.MAX_VALUE, true, true))
             .setRestartAllServices()
             .build();
@@ -100,6 +102,7 @@ class RealmDefinitions {
     static final SimpleAttributeDefinition BF_SESSION_TIMEOUT = new SimpleAttributeDefinitionBuilder(ElytronDescriptionConstants.SESSION_TIMEOUT, ModelType.INT)
             .setRequired(false)
             .setAllowExpression(true)
+            .setMeasurementUnit(MeasurementUnit.MINUTES)
             .setValidator(new IntRangeValidator(-1, Integer.MAX_VALUE, true, true))
             .setRestartAllServices()
             .build();

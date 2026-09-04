@@ -8,6 +8,7 @@ package org.wildfly.extension.elytron;
 import static org.wildfly.extension.elytron.Capabilities.SECURITY_REALM_CAPABILITY;
 import static org.wildfly.extension.elytron.Capabilities.SECURITY_REALM_RUNTIME_CAPABILITY;
 import static org.wildfly.extension.elytron.ElytronDefinition.commonDependencies;
+import static org.wildfly.extension.elytron.RealmDefinitions.BRUTE_FORCE_PROTECTION;
 import static org.wildfly.extension.elytron.RealmDefinitions.createBruteForceRealmTransformer;
 
 import java.util.ArrayList;
@@ -70,7 +71,7 @@ class DistributedRealmDefinition extends SimpleResourceDefinition {
             .setDefaultValue(ModelNode.TRUE)
             .build();
 
-    static final AttributeDefinition[] ATTRIBUTES = new AttributeDefinition[] {REALMS, IGNORE_UNAVAILABLE_REALMS, EMIT_EVENTS, RealmDefinitions.BRUTE_FORCE_PROTECTION};
+    static final AttributeDefinition[] ATTRIBUTES = new AttributeDefinition[] {REALMS, IGNORE_UNAVAILABLE_REALMS, EMIT_EVENTS, BRUTE_FORCE_PROTECTION};
 
     private static final AbstractAddStepHandler ADD = new RealmAddHandler();
     private static final OperationStepHandler REMOVE = new TrivialCapabilityServiceRemoveHandler(ADD, SECURITY_REALM_RUNTIME_CAPABILITY);

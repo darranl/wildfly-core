@@ -16,6 +16,7 @@ import static org.wildfly.extension.elytron.ElytronDescriptionConstants.SALTED_S
 import static org.wildfly.extension.elytron.ElytronDescriptionConstants.SCRAM_MAPPER;
 import static org.wildfly.extension.elytron.ElytronDescriptionConstants.SIMPLE_DIGEST_MAPPER;
 import static org.wildfly.extension.elytron.ElytronDescriptionConstants.UTF_8;
+import static org.wildfly.extension.elytron.RealmDefinitions.BRUTE_FORCE_PROTECTION;
 import static org.wildfly.extension.elytron.RealmDefinitions.createBruteForceRealmTransformer;
 import static org.wildfly.extension.elytron._private.ElytronSubsystemMessages.ROOT_LOGGER;
 
@@ -569,7 +570,7 @@ class JdbcRealmDefinition extends SimpleResourceDefinition {
             .setAllowExpression(true)
             .build();
 
-    static final AttributeDefinition[] ATTRIBUTES = new AttributeDefinition[] {PrincipalQueryAttributes.PRINCIPAL_QUERIES_7_0, HASH_CHARSET, RealmDefinitions.BRUTE_FORCE_PROTECTION};
+    static final AttributeDefinition[] ATTRIBUTES = new AttributeDefinition[] {PrincipalQueryAttributes.PRINCIPAL_QUERIES_7_0, HASH_CHARSET, BRUTE_FORCE_PROTECTION};
 
     private static final AbstractAddStepHandler ADD = new RealmAddHandler();
     private static final OperationStepHandler REMOVE = new TrivialCapabilityServiceRemoveHandler(ADD, SECURITY_REALM_RUNTIME_CAPABILITY);

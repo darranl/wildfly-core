@@ -7,6 +7,7 @@ package org.wildfly.extension.elytron;
 import static org.wildfly.extension.elytron.Capabilities.SECURITY_REALM_CAPABILITY;
 import static org.wildfly.extension.elytron.Capabilities.SECURITY_REALM_RUNTIME_CAPABILITY;
 import static org.wildfly.extension.elytron.ElytronDefinition.commonDependencies;
+import static org.wildfly.extension.elytron.RealmDefinitions.BRUTE_FORCE_PROTECTION;
 import static org.wildfly.extension.elytron.RealmDefinitions.createBruteForceRealmTransformer;
 
 import java.util.Map;
@@ -75,7 +76,7 @@ class CachingRealmDefinition extends SimpleResourceDefinition {
             .setRestartAllServices()
             .build();
 
-    static final AttributeDefinition[] ATTRIBUTES = new AttributeDefinition[] {REALM_NAME, MAXIMUM_ENTRIES, MAXIMUM_AGE, RealmDefinitions.BRUTE_FORCE_PROTECTION};
+    static final AttributeDefinition[] ATTRIBUTES = new AttributeDefinition[] {REALM_NAME, MAXIMUM_ENTRIES, MAXIMUM_AGE, BRUTE_FORCE_PROTECTION};
 
     // Callers are expected to just use a single method get / put / remove not multiple calls so we don't
     // need complex locking beyond the Map itself..

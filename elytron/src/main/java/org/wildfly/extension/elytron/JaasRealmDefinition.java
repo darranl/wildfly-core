@@ -10,6 +10,7 @@ import static org.wildfly.extension.elytron.ClassLoadingAttributeDefinitions.res
 import static org.wildfly.extension.elytron.ElytronDefinition.commonDependencies;
 import static org.wildfly.extension.elytron.FileAttributeDefinitions.pathName;
 import static org.wildfly.extension.elytron.FileAttributeDefinitions.pathResolver;
+import static org.wildfly.extension.elytron.RealmDefinitions.BRUTE_FORCE_PROTECTION;
 import static org.wildfly.extension.elytron.RealmDefinitions.createBruteForceRealmTransformer;
 import static org.wildfly.extension.elytron.SecurityActions.doPrivileged;
 import static org.wildfly.extension.elytron._private.ElytronSubsystemMessages.ROOT_LOGGER;
@@ -80,7 +81,7 @@ public class JaasRealmDefinition extends SimpleResourceDefinition {
             .setRestartAllServices()
             .build();
 
-    static final AttributeDefinition[] ATTRIBUTES = new AttributeDefinition[]{ENTRY, PATH, RELATIVE_TO, MODULE, CALLBACK_HANDLER, RealmDefinitions.BRUTE_FORCE_PROTECTION};
+    static final AttributeDefinition[] ATTRIBUTES = new AttributeDefinition[]{ENTRY, PATH, RELATIVE_TO, MODULE, CALLBACK_HANDLER, BRUTE_FORCE_PROTECTION};
 
     private static final AbstractAddStepHandler ADD = new JaasRealmDefinition.RealmAddHandler();
     private static final OperationStepHandler REMOVE = new TrivialCapabilityServiceRemoveHandler(ADD, SECURITY_REALM_RUNTIME_CAPABILITY);

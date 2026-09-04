@@ -92,11 +92,19 @@
             <users-properties path="users-hashed.properties" relative-to="jboss.server.config.dir"/>
             <brute-force-protection enabled="true" max-failed-attempts="5" lockout-interval="10" session-timeout="15" max-cached-sessions="1000"/>
         </properties-realm>
+        <properties-realm name="PropRealm-expressions">
+            <users-properties path="users-hashed.properties" relative-to="jboss.server.config.dir"/>
+            <brute-force-protection enabled="${exp.bf.enabled:true}" max-failed-attempts="${exp.bf.max-attempts:5}" lockout-interval="${exp.bf.lockout:10}" session-timeout="${exp.bf.timeout:15}" max-cached-sessions="${exp.bf.max-sessions:1000}"/>
+        </properties-realm>
         <properties-realm name="NonDomainRealm">
             <users-properties path="users-hashed.properties" relative-to="jboss.server.config.dir"/>
         </properties-realm>
         <filesystem-realm name="FileRealm" levels="2" encoded="false">
             <brute-force-protection enabled="false" max-failed-attempts="3"/>
+            <file path="filesystem-realm" relative-to="jboss.server.config.dir"/>
+        </filesystem-realm>
+        <filesystem-realm name="FileRealm-expressions" levels="2" encoded="false">
+            <brute-force-protection enabled="${exp.bf.enabled:false}" max-failed-attempts="${exp.bf.max-attempts:3}" lockout-interval="${exp.bf.lockout:20}" session-timeout="${exp.bf.timeout:30}" max-cached-sessions="${exp.bf.max-sessions:2000}"/>
             <file path="filesystem-realm" relative-to="jboss.server.config.dir"/>
         </filesystem-realm>
         <distributed-realm name="DistributedRealm" realms="FileRealm PropRealm"/>

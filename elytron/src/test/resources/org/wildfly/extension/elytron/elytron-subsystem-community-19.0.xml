@@ -35,9 +35,6 @@
         <virtual-security-domain name="VirtualDomain" outflow-security-domains="MyDomain" outflow-anonymous="true" />
         <virtual-security-domain name="AnotherVirtualDomain" outflow-security-domains="MyDomain" outflow-anonymous="true" auth-method="OIDC"/>
     </security-domains>
-    <dir-contexts>
-        <dir-context name="DirContext" url="ldap://localhost:10389/" authentication-level="simple" connection-timeout="5000"/>
-    </dir-contexts>
     <security-realms>
         <aggregate-realm name="AggregateOne" authentication-realm="PropRealm" authorization-realm="FileRealm" />
         <aggregate-realm name="AggregateTwo" authentication-realm="JdbcRealm" authorization-realms="AggregateOne FileRealm" />
@@ -117,14 +114,6 @@
         <properties-realm name="NonDomainRealm">
             <users-properties path="users-hashed.properties" relative-to="jboss.server.config.dir"/>
         </properties-realm>
-        <filesystem-realm name="FileRealm" levels="2" encoded="false">
-            <brute-force-protection enabled="false" max-failed-attempts="3"/>
-            <file path="filesystem-realm" relative-to="jboss.server.config.dir"/>
-        </filesystem-realm>
-        <filesystem-realm name="FileRealm-expressions" levels="2" encoded="false">
-            <brute-force-protection enabled="${exp.bf.enabled:false}" max-failed-attempts="${exp.bf.max-attempts:3}" lockout-interval="${exp.bf.lockout:20}" session-timeout="${exp.bf.timeout:30}" max-cached-sessions="${exp.bf.max-sessions:2000}"/>
-            <file path="filesystem-realm" relative-to="jboss.server.config.dir"/>
-        </filesystem-realm>
         <ldap-realm name="LdapRealm" dir-context="DirContext" direct-verification="true">
             <identity-mapping rdn-identifier="uid" search-base-dn="ou=users,dc=example,dc=com">
                 <attribute-mapping>
@@ -141,12 +130,14 @@
             </identity-mapping>
             <brute-force-protection enabled="${exp.bf.enabled:true}" max-failed-attempts="${exp.bf.max-attempts:7}" lockout-interval="${exp.bf.lockout:20}" session-timeout="${exp.bf.timeout:40}" max-cached-sessions="${exp.bf.max-sessions:3000}"/>
         </ldap-realm>
-        <jaas-realm name="JaasRealm" entry="test-entry">
-            <brute-force-protection enabled="false" max-failed-attempts="4"/>
-        </jaas-realm>
-        <jaas-realm name="JaasRealm-expressions" entry="test-entry">
-            <brute-force-protection enabled="${exp.bf.enabled:false}" max-failed-attempts="${exp.bf.max-attempts:4}" lockout-interval="${exp.bf.lockout:18}" session-timeout="${exp.bf.timeout:35}" max-cached-sessions="${exp.bf.max-sessions:4000}"/>
-        </jaas-realm>
+        <filesystem-realm name="FileRealm" levels="2" encoded="false">
+            <brute-force-protection enabled="false" max-failed-attempts="3"/>
+            <file path="filesystem-realm" relative-to="jboss.server.config.dir"/>
+        </filesystem-realm>
+        <filesystem-realm name="FileRealm-expressions" levels="2" encoded="false">
+            <brute-force-protection enabled="${exp.bf.enabled:false}" max-failed-attempts="${exp.bf.max-attempts:3}" lockout-interval="${exp.bf.lockout:20}" session-timeout="${exp.bf.timeout:30}" max-cached-sessions="${exp.bf.max-sessions:2000}"/>
+            <file path="filesystem-realm" relative-to="jboss.server.config.dir"/>
+        </filesystem-realm>
         <caching-realm name="CachingRealm" realm="PropRealm" maximum-entries="100">
             <brute-force-protection enabled="true" max-failed-attempts="6" lockout-interval="14" session-timeout="28" max-cached-sessions="6000"/>
         </caching-realm>
@@ -165,6 +156,12 @@
         <failover-realm name="FailoverRealm-expressions" delegate-realm="JdbcRealm" failover-realm="PropRealm">
             <brute-force-protection enabled="${exp.bf.enabled:true}" max-failed-attempts="${exp.bf.max-attempts:11}" lockout-interval="${exp.bf.lockout:25}" session-timeout="${exp.bf.timeout:50}" max-cached-sessions="${exp.bf.max-sessions:8000}"/>
         </failover-realm>
+        <jaas-realm name="JaasRealm" entry="test-entry">
+            <brute-force-protection enabled="false" max-failed-attempts="4"/>
+        </jaas-realm>
+        <jaas-realm name="JaasRealm-expressions" entry="test-entry">
+            <brute-force-protection enabled="${exp.bf.enabled:false}" max-failed-attempts="${exp.bf.max-attempts:4}" lockout-interval="${exp.bf.lockout:18}" session-timeout="${exp.bf.timeout:35}" max-cached-sessions="${exp.bf.max-sessions:4000}"/>
+        </jaas-realm>
     </security-realms>
     <credential-security-factories>
         <custom-credential-security-factory name="CustomFactory" module="a.b.c" class-name="org.wildfly.security.ElytronFactory">
@@ -463,6 +460,9 @@
         <resolver name="A" credential-store="test1" secret-key="C"/>
         <resolver name="D" credential-store="test2" secret-key="F"/>
     </expression-resolver>
+    <dir-contexts>
+        <dir-context name="DirContext" url="ldap://localhost:10389/" authentication-level="simple" connection-timeout="5000"/>
+    </dir-contexts>
     <jaspi>
         <jaspi-configuration name="test" layer="HttpServlet" application-context="default /test" description="Test Definition">
             <server-auth-modules>
